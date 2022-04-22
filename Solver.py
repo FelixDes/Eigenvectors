@@ -36,9 +36,9 @@ class Solver:
         return requests.get(query_url).json()
 
     def build_equation(self) -> str:
-        equation = ""
+        matrix = ""
         # some building logics
-        return equation
+        return f"determinator {matrix} = 0"
 
     def get_values_from_json(self, json) -> list:
         # parsing magic
