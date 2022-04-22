@@ -29,15 +29,20 @@
         </widget>
        </item>
        <item>
-        <widget class="QSpinBox" name="sizeSpin"/>
+        <widget class="QSpinBox" name="sizeSpin">
+         <property name="minimum">
+          <number>1</number>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_3"/>
-     </item>
-     <item>
-      <widget class="QTableWidget" name="inputTable"/>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QTableWidget" name="inputTable"/>
+       </item>
+      </layout>
      </item>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_2">

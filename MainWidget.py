@@ -43,7 +43,7 @@ class MainWidget(QWidget):
 
     def run(self):
         fill_empty_cells_with_zeroes(self.inputTable)
-        self.solver.run(get_element_list_from_table(self.inputTable))
+        self.solver.solve(get_element_list_from_table(self.inputTable))
 
     @staticmethod
     def start_window():
