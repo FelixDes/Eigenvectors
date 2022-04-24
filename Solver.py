@@ -36,8 +36,24 @@ class Solver:
         return requests.get(query_url).json()
 
     def build_equation(self) -> str:
-        matrix = "{{3-x,2,4},{3,5-x,8},{1,4,2-x}}"
+        # matrix = "{{3-x,2,4},{3,5-x,8},{1,4,2-x}}"
         # some building logics
+        size = len(self.matrix)
+        if size == 1:
+            return str(self.matrix[0][0]) + "-x = 0"
+        matrix = "{"
+        for i in range(size):
+            matrix += "{"
+            for j in range(size):
+                matrix += str(self.matrix[i][j])
+                if i == j:
+                    matrix += "-x"
+                if j != size - 1:
+                    matrix += ","
+            matrix += "}"
+            if i != size - 1:
+                matrix += ","
+        matrix += "}"
         return f"determinant {matrix} = 0"
 
     def set_values_from_json(self, json) -> list:
