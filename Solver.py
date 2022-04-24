@@ -30,17 +30,18 @@ class Solver:
         query_url = f"http://api.wolframalpha.com/v2/query?" \
                     f"appid={appid}" \
                     f"&input={query}" \
-                    f"&includepodid=Result" \
+                    f"&podstate=Solutions" \
                     f"&output=json"
 
         return requests.get(query_url).json()
 
     def build_equation(self) -> str:
-        matrix = ""
+        matrix = "{{3-x,2,4}, {3,5-x,8}, {1,4,2-x}}"
         # some building logics
-        return f"determinator {matrix} = 0"
+        return f"determinant {matrix} = 0"
 
     def set_values_from_json(self, json) -> list:
+        print(str(json).replace('\'', '\"'))
         # parsing magic
         self.values = ["val0", "val1", "val2"]
 
