@@ -19,8 +19,8 @@ class Solver:
 
         json = self.get_json_of_response()
 
-        self.values = self.get_values_from_json(json)
-        self.vectors = self.get_vectors_for_values()
+        self.set_values_from_json(json)
+        self.set_vectors_for_values()
         print(self.values, self.vectors)
 
     def get_json_of_response(self) -> dict:
@@ -40,10 +40,10 @@ class Solver:
         # some building logics
         return f"determinator {matrix} = 0"
 
-    def get_values_from_json(self, json) -> list:
+    def set_values_from_json(self, json) -> list:
         # parsing magic
-        return ["val0", "val3", "val2"]
+        self.values = ["val0", "val1", "val2"]
 
-    def get_vectors_for_values(self) -> list:
+    def set_vectors_for_values(self) -> list:
         # gauss stuff
-        return ["vector0", "vector1", "vector2"]
+        self.vectors = ["vector0", "vector1", "vector2"]
