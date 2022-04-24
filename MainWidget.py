@@ -3,8 +3,7 @@ import sys
 from PyQt6 import uic
 from PyQt6.QtCore import QRegularExpression
 from PyQt6.QtGui import QRegularExpressionValidator
-from PyQt6.QtWidgets import QMainWindow, QPushButton, QTableWidget, QScrollArea, QApplication, QWidget, \
-    QStyledItemDelegate, QLineEdit, QTableWidgetItem
+from PyQt6.QtWidgets import QApplication, QWidget, QStyledItemDelegate, QLineEdit, QTableWidgetItem, QLabel
 
 from Solver import Solver
 
@@ -28,6 +27,7 @@ class MainWidget(QWidget):
         uic.loadUi("ui.ui", self)
         self.configurate_fields()
         self.set_listeners()
+        self.set_sizes(self.sizeSpin.value())
 
     def configurate_fields(self):
         delegate = NumericDelegate(self.inputTable)
@@ -44,6 +44,18 @@ class MainWidget(QWidget):
     def run(self):
         fill_empty_cells_with_zeroes(self.inputTable)
         self.solver.solve(get_element_list_from_table(self.inputTable))
+        self.clear_output()
+        self.fill_output()
+
+    def clear_output(self):
+        for _ in range(self.outputValuesLayout.count()):
+            self.outputValuesLayout.itemAt(0).widget().setParent(None)
+            self.outputVectorsLayout.itemAt(0).widget().setParent(None)
+
+    def fill_output(self):
+        for i in range(len(self.solver.values)):
+            self.outputValuesLayout.addWidget(QLabel(str(self.solver.values[i])))
+            self.outputVectorsLayout.addWidget(QLabel(str(self.solver.vectors[i])))
 
     @staticmethod
     def start_window():
@@ -68,4 +80,3 @@ def get_element_list_from_table(table) -> list:
             sub_lst.append(float(table.item(i, j).text()))
         lst.append(sub_lst)
     return lst
-

@@ -42,8 +42,8 @@ class Solver:
 
     def get_values_from_json(self, json) -> list:
         # parsing magic
-        return list()
+        return ["val0", "val3", "val2"]
 
     def get_vectors_for_values(self) -> list:
         # gauss stuff
-        return list()
+        return ["vector0", "vector1", "vector2"]
