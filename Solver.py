@@ -36,7 +36,7 @@ class Solver:
         return requests.get(query_url).json()
 
     def build_equation(self) -> str:
-        matrix = "{{3-x,2,4}, {3,5-x,8}, {1,4,2-x}}"
+        matrix = "{{3-x,2,4},{3,5-x,8},{1,4,2-x}}"
         # some building logics
         return f"determinant {matrix} = 0"
 
