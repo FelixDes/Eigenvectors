@@ -67,6 +67,7 @@ class Solver:
         pass
 
     def split_equation_for_roots(self, equation) -> dict:
+        # equation.replace(" (", "|").replace("(", "").replace(")", "").split("|")
         pass
 
     def set_values(self, roots):
