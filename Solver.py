@@ -19,7 +19,10 @@ class Solver:
 
         json = self.get_json_of_response()
 
-        self.set_values_from_json(json)
+        list_of_equations = self.get_equations_from_json(json)
+        equation = self.select_equation(list_of_equations)
+        roots = self.split_equation_for_roots(equation)
+        self.set_values(roots)
         self.set_vectors_for_values()
         print(self.values, self.vectors)
 
@@ -32,15 +35,13 @@ class Solver:
                     f"&input={query}" \
                     f"&podstate=Solutions" \
                     f"&output=json"
-
+        print(str(requests.get(query_url).json()).replace('\'', '\"'))
         return requests.get(query_url).json()
 
     def build_equation(self) -> str:
-        # matrix = "{{3-x,2,4},{3,5-x,8},{1,4,2-x}}"
-        # some building logics
         size = len(self.matrix)
         if size == 1:
-            return str(self.matrix[0][0]) + "-x = 0"
+            raise Exception("Can not parse matrix for one element")
         matrix = "{"
         for i in range(size):
             matrix += "{"
@@ -56,11 +57,23 @@ class Solver:
         matrix += "}"
         return f"determinant {matrix} = 0"
 
-    def set_values_from_json(self, json) -> list:
-        print(str(json).replace('\'', '\"'))
-        # parsing magic
-        self.values = ["val0", "val1", "val2"]
+    def get_equations_from_json(self, json):
+        res = list()
+        for block in json["queryresult"]["pods"][3]["subpods"]:
+            res.append(block["plaintext"])
+        return res
+
+    def select_equation(self, equations) -> str:
+        pass
+
+    def split_equation_for_roots(self, equation) -> dict:
+        pass
+
+    def set_values(self, roots):
+        for val in roots.keys():
+            for _ in roots.get(val):
+                self.values.append(val)
 
     def set_vectors_for_values(self) -> list:
-        # gauss stuff
+        # math stuff
         self.vectors = ["vector0", "vector1", "vector2"]
