@@ -37,7 +37,7 @@ class Solver:
                     f"&podstate=Solutions" \
                     f"&output=json"
 
-        print(str(requests.get(query_url).json()).replace('\'', '\"'))
+        # print(str(requests.get(query_url).json()).replace('\'', '\"'))
         return requests.get(query_url).json()
 
     def build_equation(self) -> str:
@@ -72,16 +72,18 @@ class Solver:
         raise Exception("Some of the roots are not real")
 
     def split_equation_for_roots(self, equation) -> dict:
-        return {int(i.split("^")[0].replace(" ", "").replace("x", "")) * -1: 1 if i.find("^") == -1 else int(
+        return {float(i.split("^")[0].replace(" ", "").replace("x", "")) * -1: 1 if i.find("^") == -1 else int(
             i.split("^")[-1]) for i in
                 equation.replace("-(", "").replace(" (", "|").replace("(", "").replace(")", "").split(" =")[0].split(
                     "|")}
 
     def set_values(self, roots):
-        for val in roots.keys():
-            for _ in roots.get(val):
-                self.values.append(val)
+        self.values = list()
+        for k in roots.keys():
+            for _ in range(int(roots.get(k))):
+                self.values.append(k)
 
     def set_vectors_for_values(self) -> list:
+        self.vectors = list()
         # math stuff
-        self.vectors = ["vector0", "vector1", "vector2"]
+        self.vectors = ["vector0","vector0","vector0","vector0","vector0","vector0","vector0","vector0"]
