@@ -1,5 +1,6 @@
 import os
 import urllib
+import re
 
 import requests
 
@@ -65,7 +66,10 @@ class Solver:
         return res
 
     def select_equation(self, equations) -> str:
-        pass
+        for eq in equations:
+            if re.fullmatch("\-?((\(x[+\-]\d+(.\d*)?\))(\^\d+)?)+=0", eq.replace(' ', '')):
+                return eq
+        raise Exception("Some of the roots are not real")
 
     def split_equation_for_roots(self, equation) -> dict:
         return {int(i.split("^")[0].replace(" ", "").replace("x", "")) * -1: 1 if i.find("^") == -1 else int(
