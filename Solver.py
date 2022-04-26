@@ -35,6 +35,7 @@ class Solver:
                     f"&input={query}" \
                     f"&podstate=Solutions" \
                     f"&output=json"
+
         print(str(requests.get(query_url).json()).replace('\'', '\"'))
         return requests.get(query_url).json()
 
