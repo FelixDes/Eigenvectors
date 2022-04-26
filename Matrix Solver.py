@@ -83,7 +83,7 @@ class MatrixSolver:  # Класс для выполнения математич
         return table_res
 
     # Транспонирование матрицы
-    def reverse(input_table):
+    def reverse(self, input_table):
         table_res = []
         for i in range(len(input_table)):
             table_row = []
