@@ -68,8 +68,10 @@ class Solver:
         pass
 
     def split_equation_for_roots(self, equation) -> dict:
-        return {int(i.split("^")[0].replace(" ", "").replace("x", ""))*-1: 1 if i.find("^") == -1 else int(i.split("^")[-1]) for i in equation.replace("-(", "").replace(" (", "|").replace("(", "").replace(")", "").split(" =")[0].split("|")}
-
+        return {int(i.split("^")[0].replace(" ", "").replace("x", "")) * -1: 1 if i.find("^") == -1 else int(
+            i.split("^")[-1]) for i in
+                equation.replace("-(", "").replace(" (", "|").replace("(", "").replace(")", "").split(" =")[0].split(
+                    "|")}
 
     def set_values(self, roots):
         for val in roots.keys():
