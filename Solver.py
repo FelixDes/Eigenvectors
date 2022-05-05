@@ -86,4 +86,27 @@ class Solver:
     def set_vectors_for_values(self) -> list:
         self.vectors = list()
         # math stuff
-        self.vectors = ["vector0","vector0","vector0","vector0","vector0","vector0","vector0","vector0"]
+        self.vectors = ["vector0", "vector0", "vector0", "vector0", "vector0", "vector0", "vector0", "vector0"]
+
+    def get_rank(self, matrix):
+        rank = len(matrix)
+        for row in range(rank):
+            if matrix[row][row]:
+                for col in range(len(matrix)):
+                    if col != row:
+                        mult = matrix[col][row] / matrix[row][row]
+                        for i in range(rank):
+                            matrix[col][i] -= mult * matrix[row][i]
+            else:
+                reduce = True
+                for i in range(row + 1, len(matrix)):
+                    if (matrix[i][row]):
+                        matrix[row][rank], matrix[i][rank] = matrix[i][rank], matrix[row][rank]
+                        reduce = False
+                        break
+                if reduce:
+                    rank -= 1
+                    for i in range(len(matrix)):
+                        matrix[i][row] = matrix[i][rank]
+                row -= 1
+        return rank
