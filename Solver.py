@@ -24,7 +24,7 @@ class Solver:
         equation = self.select_equation(list_of_equations)
         roots = self.split_equation_for_roots(equation)
         self.set_values(roots)
-        self.set_vectors_for_values()
+        self.set_vectors(roots)
         print(self.values, self.vectors)
 
     def get_json_of_response(self) -> dict:
@@ -83,10 +83,13 @@ class Solver:
             for _ in range(int(roots.get(k))):
                 self.values.append(k)
 
-    def set_vectors_for_values(self) -> list:
-        self.vectors = list()
-        # math stuff
-        self.vectors = ["vector0", "vector0", "vector0", "vector0", "vector0", "vector0", "vector0", "vector0"]
+    def set_vectors(self) -> list:
+
+        for e_val in self.values:
+            matrix = self.matrix.copy()
+            for i in range(len(self.matrix)):
+                matrix[i][i] -= e_val
+            self.vectors.append(self.solve_for_gauss_method(matrix, self.get_rank(matrix)))
 
     def get_rank(self, matrix):
         rank = len(matrix)
@@ -100,7 +103,7 @@ class Solver:
             else:
                 reduce = True
                 for i in range(row + 1, len(matrix)):
-                    if (matrix[i][row]):
+                    if matrix[i][row]:
                         matrix[row][rank], matrix[i][rank] = matrix[i][rank], matrix[row][rank]
                         reduce = False
                         break
@@ -110,3 +113,29 @@ class Solver:
                         matrix[i][row] = matrix[i][rank]
                 row -= 1
         return rank
+
+    def solve_for_gauss_method(self, matrix, rank):
+        matrix = sorted(matrix, reverse=True)
+
+        for i in range(len(matrix)):
+            for j in range(i + 1, len(matrix)):
+                if matrix[j][i] != 0:
+                    coef = -matrix[i][i] / matrix[j][i]
+                    for k in range(i, len(matrix)):
+                        matrix[j][k] = matrix[j][k] * coef + matrix[i][k]
+
+        vectors = list()
+
+        for rank_i in range(len(matrix) - rank):
+            res = [[0] for _ in range(len(matrix))]
+            right_values = [[0] for _ in range(len(matrix))]
+
+            for i in range(len(matrix) - rank):
+                res[len(matrix) - 1 - i][0] = 1 if rank_i == i else 0
+
+            for i in range(len(matrix) - 1 - (len(matrix) - rank), -1, -1):
+                for j in range(i + 1, len(matrix)):
+                    right_values[i][0] -= matrix[i][j] * res[j][0]
+                res[i][0] = right_values[i][0] / matrix[i][i]
+            vectors.append(res.copy())
+        return vectors
