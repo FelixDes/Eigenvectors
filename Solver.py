@@ -67,7 +67,7 @@ class Solver:
 
     def select_equation(self, equations) -> str:
         for eq in equations:
-            if re.fullmatch("\-?((\(x[+\-]\d+(.\d*)?\))(\^\d+)?)+=0", eq.replace(' ', '')):
+            if re.fullmatch("\-?(x(\^\d+)?)?((\(x[+\-]\d+(.\d*)?\))(\^\d+)?(x(\^\d+)?)?)*=0", eq.replace(' ', '')):
                 return eq
         raise Exception("Some of the roots are not real")
 
