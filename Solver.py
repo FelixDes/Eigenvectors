@@ -88,7 +88,8 @@ class Solver:
         # math stuff
         self.vectors = ["vector0", "vector0", "vector0", "vector0", "vector0", "vector0", "vector0", "vector0"]
 
-    def get_rank(self, matrix):
+    def get_rank(self, m):
+        matrix = m.copy()
         rank = len(matrix)
         for row in range(rank):
             if matrix[row][row]:
