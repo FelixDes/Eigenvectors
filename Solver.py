@@ -91,7 +91,8 @@ class Solver:
                 matrix[i][i] -= e_val
             self.vectors.append(self.solve_for_gauss_method(matrix, self.get_rank(matrix)))
 
-    def get_rank(self, matrix):
+    def get_rank(self, m):
+        matrix = m.copy()
         rank = len(matrix)
         for row in range(rank):
             if matrix[row][row]:
