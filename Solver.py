@@ -83,7 +83,7 @@ class Solver:
                 self.values.append(k)
 
     def set_vectors_for_values(self):
-        self.values, self.vectors = self.get_data_for_gateway()
+        self.vectors = self.get_data_for_gateway()
 
     def get_data_for_gateway(self):
         gateway = JavaGateway()
@@ -98,8 +98,8 @@ class Solver:
             for j in range(len(self.matrix[i])):
                 java_matrix[i][j] = self.matrix[i][j]
 
-        response = gateway.entry_point.run(java_matrix, java_array)
+        response = gateway.entry_point.getResponseForMatrix(java_matrix, java_array)
 
         vectors = [str(list(response.getEVectors()[i].toArray()))[1:-1] for i in range(response.getEVectors().size())]
 
-        return list(response.getEValues().toArray()), vectors
+        return vectors
