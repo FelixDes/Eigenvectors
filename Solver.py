@@ -4,28 +4,28 @@ import re
 
 import requests
 
+from py4j.java_gateway import JavaGateway
+
 with open("key.txt", "r") as key_file:
     key = key_file.readline()
 
 
 class Solver:
-    def __init__(self):
-        self.matrix = list()
+    def __init__(self, matrix):
+        self.matrix = matrix
 
         self.values = list()
         self.vectors = list()
 
-    def solve(self, matrix):
-        self.matrix = matrix
-
+    def solve(self):
         json = self.get_json_of_response()
 
         list_of_equations = self.get_equations_from_json(json)
         equation = self.select_equation(list_of_equations)
         roots = self.split_equation_for_roots(equation)
+
         self.set_values(roots)
         self.set_vectors_for_values()
-        print(self.values, self.vectors)
 
     def get_json_of_response(self) -> dict:
         appid = os.getenv('WA_APPID', key)
@@ -37,7 +37,6 @@ class Solver:
                     f"&podstate=Solutions" \
                     f"&output=json"
 
-        # print(str(requests.get(query_url).json()).replace('\'', '\"'))
         return requests.get(query_url).json()
 
     def build_equation(self) -> str:
@@ -67,7 +66,7 @@ class Solver:
 
     def select_equation(self, equations) -> str:
         for eq in equations:
-            if re.fullmatch("\-?((\(x[+\-]\d+(.\d*)?\))(\^\d+)?)+=0", eq.replace(' ', '')):
+            if re.fullmatch("\-?(x(\^\d+)?)?((\(x[+\-]\d+(.\d*)?\))(\^\d+)?(x(\^\d+)?)?)*=0", eq.replace(' ', '')):
                 return eq
         raise Exception("Some of the roots are not real")
 
@@ -83,30 +82,24 @@ class Solver:
             for _ in range(int(roots.get(k))):
                 self.values.append(k)
 
-    def set_vectors_for_values(self) -> list:
-        self.vectors = list()
-        # math stuff
-        self.vectors = ["vector0", "vector0", "vector0", "vector0", "vector0", "vector0", "vector0", "vector0"]
+    def set_vectors_for_values(self):
+        self.values, self.vectors = self.get_data_for_gateway()
 
-    def get_rank(self, matrix):
-        rank = len(matrix)
-        for row in range(rank):
-            if matrix[row][row]:
-                for col in range(len(matrix)):
-                    if col != row:
-                        mult = matrix[col][row] / matrix[row][row]
-                        for i in range(rank):
-                            matrix[col][i] -= mult * matrix[row][i]
-            else:
-                reduce = True
-                for i in range(row + 1, len(matrix)):
-                    if (matrix[i][row]):
-                        matrix[row][rank], matrix[i][rank] = matrix[i][rank], matrix[row][rank]
-                        reduce = False
-                        break
-                if reduce:
-                    rank -= 1
-                    for i in range(len(matrix)):
-                        matrix[i][row] = matrix[i][rank]
-                row -= 1
-        return rank
+    def get_data_for_gateway(self):
+        gateway = JavaGateway()
+
+        java_matrix = gateway.new_array(gateway.jvm.java.lang.Double, len(self.matrix), len(self.matrix[0]))
+        java_array = gateway.new_array(gateway.jvm.java.lang.Double, len(self.values))
+
+        for i in range(len(self.values)):
+            java_array[i] = self.values[i]
+
+        for i in range(len(self.matrix)):
+            for j in range(len(self.matrix[i])):
+                java_matrix[i][j] = self.matrix[i][j]
+
+        response = gateway.entry_point.run(java_matrix, java_array)
+
+        vectors = [str(list(response.getEVectors()[i].toArray()))[1:-1] for i in range(response.getEVectors().size())]
+
+        return list(response.getEValues().toArray()), vectors
