@@ -3,7 +3,7 @@ import sys
 from PyQt6 import uic, QtCore
 from PyQt6.QtCore import QRegularExpression
 from PyQt6.QtGui import QRegularExpressionValidator
-from PyQt6.QtWidgets import QApplication, QWidget, QStyledItemDelegate, QLineEdit, QTableWidgetItem, QLabel
+from PyQt6.QtWidgets import QApplication, QWidget, QStyledItemDelegate, QLineEdit, QTableWidgetItem, QLabel, QHBoxLayout
 
 from Solver import Solver
 
@@ -49,17 +49,19 @@ class MainWidget(QWidget):
         self.runButton.setEnabled(False)
 
     def clear_output(self):
-        for _ in range(self.outputValuesLayout.count()):
-            self.outputValuesLayout.itemAt(0).widget().setParent(None)
-        for _ in range(self.outputVectorsLayout.count()):
-            self.outputVectorsLayout.itemAt(0).widget().setParent(None)
+        pass
+        # for _ in range(self.outputValuesLayout.count()):
+        #     self.outputValuesLayout.itemAt(0).widget().setParent(None)
+        # for _ in range(self.outputVectorsLayout.count()):
+        #     self.outputVectorsLayout.itemAt(0).widget().setParent(None)
 
-    def fill_output(self, values, vectors):
+    def fill_output(self, result):
         self.runButton.setEnabled(True)
-        for i in range(len(values)):
-            self.outputValuesLayout.addWidget(QLabel(str(values[i])))
-        for i in range(len(vectors)):
-            self.outputVectorsLayout.addWidget(QLabel(str(vectors[i])))
+        for key in result.keys():
+            hl = QHBoxLayout()
+            hl.addWidget(QLabel(str(key)))
+            hl.addWidget(QLabel(str(result[key])))
+            self.resultLayout.addLayout(hl)
 
     @staticmethod
     def start_window():
@@ -70,7 +72,7 @@ class MainWidget(QWidget):
 
 
 class SolvingThread(QtCore.QThread):
-    threadFinish = QtCore.pyqtSignal(list, list)
+    threadFinish = QtCore.pyqtSignal(dict)
 
     def __init__(self, matrix, parent=None):
         super().__init__(parent)
@@ -78,8 +80,7 @@ class SolvingThread(QtCore.QThread):
 
     def run(self, *args, **kwargs):
         self.solver.solve()
-        print(self.solver.values, self.solver.vectors)
-        self.threadFinish.emit(self.solver.values, self.solver.vectors)
+        self.threadFinish.emit(self.solver.result)
 
 
 def fill_empty_cells_with_zeroes(table):  # пустые ячейки заполяем нулями

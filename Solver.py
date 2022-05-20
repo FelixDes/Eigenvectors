@@ -1,3 +1,5 @@
+import ast
+import json
 import os
 import urllib
 import re
@@ -14,8 +16,7 @@ class Solver:
     def __init__(self, matrix):
         self.matrix = matrix
 
-        self.values = list()
-        self.vectors = list()
+        self.result = dict()
 
     def solve(self):
         json = self.get_json_of_response()
@@ -24,8 +25,7 @@ class Solver:
         equation = self.select_equation(list_of_equations)
         roots = self.split_equation_for_roots(equation)
 
-        self.set_values(roots)
-        self.set_vectors_for_roots(roots)
+        self.set_result_for_roots(roots)
 
     def get_json_of_response(self) -> dict:
         appid = os.getenv('WA_APPID', key)
@@ -76,14 +76,14 @@ class Solver:
                 equation.replace("-(", "").replace(" (", "|").replace("(", "").replace(")", "").split(" =")[0].split(
                     "|")}
 
-    def set_values(self, roots):
-        self.values = list()
-        for k in roots.keys():
-            for _ in range(int(roots.get(k))):
-                self.values.append(k)
+    # def set_values(self, roots):
+    #     self.values = list()
+    #     for k in roots.keys():
+    #         for _ in range(int(roots.get(k))):
+    #             self.values.append(k)
 
-    def set_vectors_for_roots(self, roots):
-        self.vectors = self.get_data_for_gateway(roots)
+    def set_result_for_roots(self, roots):
+        self.get_data_for_gateway(roots)
 
     def get_data_for_gateway(self, roots):
         gateway = JavaGateway()
@@ -96,10 +96,8 @@ class Solver:
 
         for i in range(len(self.matrix)):
             for j in range(len(self.matrix[i])):
-                java_matrix[i][j] = self.matrix[i][j]
+                java_matrix[i][j] = float(self.matrix[i][j])
 
         response = gateway.entry_point.getResponseForMatrix(java_matrix, java_map)
 
-        vectors = [str(list(response.getEVectors()[i].toArray()))[1:-1] for i in range(response.getEVectors().size())]
-
-        return vectors
+        self.result = ast.literal_eval(str(response.getEVectors().toString()).replace("=", " : "))
