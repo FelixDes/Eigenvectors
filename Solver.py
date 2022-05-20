@@ -25,7 +25,7 @@ class Solver:
         roots = self.split_equation_for_roots(equation)
 
         self.set_values(roots)
-        self.set_vectors_for_values()
+        self.set_vectors_for_roots(roots)
 
     def get_json_of_response(self) -> dict:
         appid = os.getenv('WA_APPID', key)
@@ -82,23 +82,23 @@ class Solver:
             for _ in range(int(roots.get(k))):
                 self.values.append(k)
 
-    def set_vectors_for_values(self):
-        self.vectors = self.get_data_for_gateway()
+    def set_vectors_for_roots(self, roots):
+        self.vectors = self.get_data_for_gateway(roots)
 
-    def get_data_for_gateway(self):
+    def get_data_for_gateway(self, roots):
         gateway = JavaGateway()
 
         java_matrix = gateway.new_array(gateway.jvm.java.lang.Double, len(self.matrix), len(self.matrix[0]))
-        java_array = gateway.new_array(gateway.jvm.java.lang.Double, len(self.values))
+        java_map = gateway.jvm.java.util.HashMap()
 
-        for i in range(len(self.values)):
-            java_array[i] = self.values[i]
+        for item in roots.items():
+            java_map.put(item[0], item[1])
 
         for i in range(len(self.matrix)):
             for j in range(len(self.matrix[i])):
                 java_matrix[i][j] = self.matrix[i][j]
 
-        response = gateway.entry_point.getResponseForMatrix(java_matrix, java_array)
+        response = gateway.entry_point.getResponseForMatrix(java_matrix, java_map)
 
         vectors = [str(list(response.getEVectors()[i].toArray()))[1:-1] for i in range(response.getEVectors().size())]
 
