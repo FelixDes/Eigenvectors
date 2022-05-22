@@ -64,13 +64,14 @@ class Solver:
             res.append(block["plaintext"])
         return res
 
-    def select_equation(self, equations) -> str:
+    def select_equation(self, equations: list) -> str:
         for eq in equations:
             if re.fullmatch("\-?(x(\^\d+)?)?((\(x[+\-]\d+(.\d*)?\))(\^\d+)?(x(\^\d+)?)?)*=0", eq.replace(' ', '')):
                 return eq
         raise Exception("Some of the roots are not real")
 
-    def split_equation_for_roots(self, equation) -> dict:
+    def split_equation_for_roots(self, equation: str) -> dict:
+        print(equation)
         return {float(i.split("^")[0].replace(" ", "").replace("x", "")) * -1: 1 if i.find("^") == -1 else int(
             i.split("^")[-1]) for i in
                 equation.replace("-(", "").replace(" (", "|").replace("(", "").replace(")", "").split(" =")[0].split(
@@ -82,7 +83,7 @@ class Solver:
     #         for _ in range(int(roots.get(k))):
     #             self.values.append(k)
 
-    def set_result_for_roots(self, roots):
+    def set_result_for_roots(self, roots: dict):
         self.get_data_for_gateway(roots)
 
     def get_data_for_gateway(self, roots):
