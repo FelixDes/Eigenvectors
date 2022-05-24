@@ -5,7 +5,6 @@ import urllib
 import re
 
 import requests
-from PyQt6 import QtCore, QtWidgets
 
 from py4j.java_gateway import JavaGateway
 
@@ -81,19 +80,15 @@ class Solver:
     def split_equation_for_roots(self, equation: str) -> dict:
         print(equation)
         try:
-            return {float(i.split("^")[0].replace(" ", "").replace("x", "")) * -1: 1 if i.find("^") == -1 else int(
-                i.split("^")[-1]) for i in
-                    equation.replace("-(", "").replace(" (", "|").replace("(", "").replace(")", "").split(" =")[
-                        0].split(
-                        "|")}
+            roots = {}
+            for _, match in enumerate(re.finditer(r"(\(x [+\-] \d+(.\d+)?\)(\^\d*)?)|(x(\^\d+)?)", equation), start=1):
+                m = match.group().replace("(", "").replace(")", "").replace(" ", "")
+                left = m.split("^")[0].replace("x", "")
+                roots.update({float(left if left != "" else -0.) * -1:
+                                  1 if m.find("^") == -1 else int(m.split("^")[-1])})
+            return roots
         except Exception:
             raise ParseException()
-
-    # def set_values(self, roots):
-    #     self.values = list()
-    #     for k in roots.keys():
-    #         for _ in range(int(roots.get(k))):
-    #             self.values.append(k)
 
     def set_result_for_roots(self, roots: dict):
         self.get_data_for_gateway(roots)
