@@ -5,8 +5,12 @@ import urllib
 import re
 
 import requests
+from PyQt6 import QtCore, QtWidgets
 
 from py4j.java_gateway import JavaGateway
+
+from InfoWidget import InfoWidget
+from Exceptions import *
 
 with open("key.txt", "r") as key_file:
     key = key_file.readline()
@@ -22,7 +26,9 @@ class Solver:
         json = self.get_json_of_response()
 
         list_of_equations = self.get_equations_from_json(json)
+
         equation = self.select_equation(list_of_equations)
+
         roots = self.split_equation_for_roots(equation)
 
         self.set_result_for_roots(roots)
@@ -42,7 +48,7 @@ class Solver:
     def build_equation(self) -> str:
         size = len(self.matrix)
         if size == 1:
-            raise Exception("Can not parse matrix for one element")
+            raise IncorrectMatrixException()
         matrix = "{"
         for i in range(size):
             matrix += "{"
@@ -68,7 +74,7 @@ class Solver:
         for eq in equations:
             if re.fullmatch("\-?(x(\^\d+)?)?((\(x[+\-]\d+(.\d*)?\))(\^\d+)?(x(\^\d+)?)?)*=0", eq.replace(' ', '')):
                 return eq
-        raise Exception("Some of the roots are not real")
+        raise ComplexRootsException()
 
     def split_equation_for_roots(self, equation: str) -> dict:
         print(equation)
