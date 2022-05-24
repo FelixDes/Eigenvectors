@@ -55,13 +55,12 @@ class MainWidget(QWidget):
         self.runButton.setEnabled(True)
         show_info_widget(1, e.message, e.details)
 
-
     def clear_output(self):
-        pass
-        # for _ in range(self.outputValuesLayout.count()):
-        #     self.outputValuesLayout.itemAt(0).widget().setParent(None)
-        # for _ in range(self.outputVectorsLayout.count()):
-        #     self.outputVectorsLayout.itemAt(0).widget().setParent(None)
+        for _ in range(self.resultLayout.count()):
+            layout = self.resultLayout.itemAt(0).layout()
+            for _ in range(layout.count()):
+                layout.itemAt(0).widget().setParent(None)
+            layout.setParent(None)
 
     def fill_output(self, result):
         self.runButton.setEnabled(True)
