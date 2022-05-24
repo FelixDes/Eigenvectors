@@ -37,4 +37,4 @@ class GatewayException(CustomException):
 class ParseException(CustomException):
     def __init__(self):
         self.message = "Parsing exception"
-        self.details = "Please contact support"
+        self.details = "Please contact support: vip.zatebe@mail.ru"

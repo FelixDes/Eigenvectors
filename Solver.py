@@ -9,7 +9,6 @@ from PyQt6 import QtCore, QtWidgets
 
 from py4j.java_gateway import JavaGateway
 
-from InfoWidget import InfoWidget
 from Exceptions import *
 
 with open("key.txt", "r") as key_file:
@@ -65,10 +64,13 @@ class Solver:
         return f"determinant {matrix} = 0"
 
     def get_equations_from_json(self, json):
-        res = list()
-        for block in json["queryresult"]["pods"][3]["subpods"]:
-            res.append(block["plaintext"])
-        return res
+        try:
+            res = list()
+            for block in json["queryresult"]["pods"][3]["subpods"]:
+                res.append(block["plaintext"])
+            return res
+        except Exception:
+            raise ServerException()
 
     def select_equation(self, equations: list) -> str:
         for eq in equations:
@@ -78,10 +80,14 @@ class Solver:
 
     def split_equation_for_roots(self, equation: str) -> dict:
         print(equation)
-        return {float(i.split("^")[0].replace(" ", "").replace("x", "")) * -1: 1 if i.find("^") == -1 else int(
-            i.split("^")[-1]) for i in
-                equation.replace("-(", "").replace(" (", "|").replace("(", "").replace(")", "").split(" =")[0].split(
-                    "|")}
+        try:
+            return {float(i.split("^")[0].replace(" ", "").replace("x", "")) * -1: 1 if i.find("^") == -1 else int(
+                i.split("^")[-1]) for i in
+                    equation.replace("-(", "").replace(" (", "|").replace("(", "").replace(")", "").split(" =")[
+                        0].split(
+                        "|")}
+        except Exception:
+            raise ParseException()
 
     # def set_values(self, roots):
     #     self.values = list()
@@ -93,18 +99,21 @@ class Solver:
         self.get_data_for_gateway(roots)
 
     def get_data_for_gateway(self, roots):
-        gateway = JavaGateway()
+        try:
+            gateway = JavaGateway()
 
-        java_matrix = gateway.new_array(gateway.jvm.java.lang.Double, len(self.matrix), len(self.matrix[0]))
-        java_map = gateway.jvm.java.util.HashMap()
+            java_matrix = gateway.new_array(gateway.jvm.java.lang.Double, len(self.matrix), len(self.matrix[0]))
+            java_map = gateway.jvm.java.util.HashMap()
 
-        for item in roots.items():
-            java_map.put(item[0], item[1])
+            for item in roots.items():
+                java_map.put(item[0], item[1])
 
-        for i in range(len(self.matrix)):
-            for j in range(len(self.matrix[i])):
-                java_matrix[i][j] = float(self.matrix[i][j])
+            for i in range(len(self.matrix)):
+                for j in range(len(self.matrix[i])):
+                    java_matrix[i][j] = float(self.matrix[i][j])
 
-        response = gateway.entry_point.getResponseForMatrix(java_matrix, java_map)
+            response = gateway.entry_point.getResponseForMatrix(java_matrix, java_map)
 
-        self.result = ast.literal_eval(str(response.getEVectors().toString()).replace("=", " : "))
+            self.result = ast.literal_eval(str(response.getEVectors().toString()).replace("=", " : "))
+        except Exception:
+            raise GatewayException()
